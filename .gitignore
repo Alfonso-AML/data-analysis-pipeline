@@ -1,0 +1,8 @@
+.DS_Store
+.idea
+venv/
+.ipynb_checkpoints
+.env
+__pycache__
+.txt
+key.txt
