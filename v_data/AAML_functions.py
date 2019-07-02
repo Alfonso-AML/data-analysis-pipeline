@@ -1,8 +1,19 @@
 import pandas as pd
 import numpy as np
-import pprint
+import math
+import requests
+from io import BytesIO
+from fpdf import FPDF 
 
+# Funcion para obtener el csv
+def getdf():
+    dr_file = pd.read_csv("./raw_data/lst_films.csv", encoding="utf8")
+    cols=list(dr_file.columns)
+    return dr_file
 
+# Funcion para guardar el csv
+def filesaver(file_n):
+    file_n.to_csv('./c_films.csv')
 
 def dfcleaner(df):
     cols=list(df.columns)
@@ -17,10 +28,8 @@ def dfcleaner(df):
 
 
 
-# A partir de aqui, es toda la operación para trabajar la API
 
-import requests
-from io import BytesIO
+# A partir de aqui, es toda la operación para trabajar la API
 
 def pelisapi():
     films = pd.read_csv('./c_films.csv')
@@ -76,7 +85,9 @@ def pelisapi():
                     values += [float(i.replace('/100', ''))/10]
                 elif "/10" in i:
                     values += [float(i.replace('/10', ''))]
-            average = np.mean(values)    
+            
+            average = np.mean(values) 
+            
 
             filmbag.append ([request, synopsis, film_info['Poster'], average])
             
@@ -90,4 +101,8 @@ def pelisapi():
     
     return film_req
 
+def pdfcreator():
+    pdf=FPDF()
+    pdf.add_page()
+    pdf.set_margins()
     
