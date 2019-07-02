@@ -4,16 +4,34 @@ import requests
 from PIL import Image
 from io import BytesIO
 from fpdf import FPDF
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4, letter
 
+"""
 def getinfo():
-    films = pd.read_csv('./c_films.csv')
-    r_films = pd.read_csv('./film_req.csv')
-    
+"""
+films = pd.read_csv('./c_films.csv')
 
+r_films = pd.read_csv('./film_req.csv')
+
+
+'''
+for x in r_films['poster']:
+    if len(x)<5:
+        x = './def_pic.jpg'
+
+print(r_films)
+'''
+title = r_films['title']
+synopsis = r_films['synopsis']
+rating = r_films['av_rating']
+
+    #return title, poster, av_rating, synopsis
+cartel = Image.open("./{}.jpg".format(r_films['ID']))
 
 # Crear pdf
 
-
+'''
 titulo='REQUESTED FILMS'
 
 class PDF(FPDF):
@@ -35,36 +53,48 @@ class PDF(FPDF):
         self.set_text_color(128)                                     # color texto en gray
         self.cell(0, 10, 'Page ' + str(self.page_no()), 0, 0, 'C')   # numero de pagina
 
+    def fimg(self):
+        c=canvas.Canvas("imagen.pdf", pagesize=A4)
+        cartel = Image.open("./{}.jpg".format(r_films['ID']))                                             # genera el pdf
+        c.drawImage(cartel, 0, 0, width=600, height=350)             # pinta la imagen
+        c.showPage()                 
+        c.save()
 
-    def chapter_title(self, numero, etiqueta):                                 # titulo del capitulo
+    def ftitle(self, title):                                                    # titulo de la pelicula
         self.set_font('Arial', '', 12)                                         # fuente Arial 12
         self.set_fill_color(200, 220, 255)                                     # color del fondo
-        self.cell(0, 6, 'Chapter %d : %s' % (numero, etiqueta), 0, 1, 'L', 1)  # titulo
+        self.cell(0, 6, title, 0, 1, 'L', 1)                                   # titulo
         self.ln(4)                                                             # salto de linea
 
+    def frating(self, rating):                                                 # titulo de la pelicula
+        self.set_font('Arial', '', 12)                                         # fuente Arial 12
+        self.set_fill_color(200, 220, 255)                                     # color del fondo
+        self.cell(0, 6, ("Film average rating: {}".format(rating), 0, 1, 'L', 1))       # titulo
+        self.ln(4)                                                             # salto de linea
+    
+    def fsynopsis(self, synopsis):                                                 # titulo de la pelicula
+        self.set_font('Arial', '', 12)                                         # fuente Arial 12
+        self.set_fill_color(200, 220, 255)                                     # color del fondo
+        self.cell(0, 6, ("SYNOPSIS: {}".format(synopsis), 0, 1, 'L', 1))       # titulo
+        self.ln(4) 
 
-    def chapter_body(self, nombre, numero):                      # cuerpo del capitulo
-        with open(nombre, 'rb') as f:                            # se lee el archivo de texto
-            txt=f.read().decode('latin-1')
-        self.set_font('Times', '', 12)                           # fuente Times 12
-        self.multi_cell(0, 5, txt)                               # texto con saltos de linea (multicelda)
-        self.ln()                                                # salto de linea
-        self.set_font('', 'I')                                   # alusion en fuente italica
-        self.cell(0, 5, '(fin del capitulo {})'.format(numero))
-
-
-    def print_chapter(self, numero, titulo, nombre):     # imprime el capitulo
+    def print_page(self, ftitle, frating, fsynopsis):     # imprime el capitulo
         self.add_page()                                  # añade pagina
-        self.chapter_title(numero, titulo)               # numero y titulo de capitulo
-        self.chapter_body(nombre, numero)                # cuerpo del capitulo
+        self.fimg ()
+        self.ftitle (title)
+        self.fsynopsis(synopsis)                # numero y titulo de capitulo
+        
+
+
+    
+    
 
 
 
 pdf=PDF()                                                             # inicia clase PDF
 pdf.set_title(titulo)                                                 # titulo
-pdf.set_author('Jake VanderPlas')                                     # autor
-pdf.print_chapter(1, 'IPython: Beyond Normal Python', 'c1.txt')       # capitulo 1
-pdf.print_chapter(2, 'Introduction to NumPy', 'c2.txt')               # capitulo 2
-pdf.output('libro.pdf', 'F')                                          # guarda pdf
+pdf.print_page(title, rating, synopsis)         # capitulo 1
+pdf.output('requested_films.pdf', 'F')                                # guarda pdf
 
 
+'''

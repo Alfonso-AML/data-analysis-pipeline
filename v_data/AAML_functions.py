@@ -2,8 +2,11 @@ import pandas as pd
 import numpy as np
 import math
 import requests
+from PIL import Image
 from io import BytesIO
-from fpdf import FPDF 
+from fpdf import FPDF
+import shutil
+ 
 
 # Funcion para obtener el csv
 def getdf():
@@ -33,7 +36,7 @@ def dfcleaner(df):
 
 def pelisapi():
     films = pd.read_csv('./c_films.csv')
-    col_names = ['ID', 'synopsis', 'poster', 'av_rating']
+    col_names = ['ID', 'title', 'synopsis', 'av_rating']
     film_req = pd.DataFrame(columns = col_names)
     filmbag = []
 
@@ -65,11 +68,23 @@ def pelisapi():
         else:
             fl_count += 1
 
+            title = film_info['Title']
+
             synopsis = film_info['Plot']
 
-            #poster = requests.get(film_info['Poster'])
-            #img = Image.open(BytesIO(poster.content))
-            #img.save("./img.jpg")
+            poster = film_info['Poster']
+
+       
+            if len(poster)<10:
+                poster = shutil.copy('def_pic.png', "./{}.jpg".format(film_info['imdbID']))
+            elif len(poster):
+                flg = requests.get(film_info['Poster'])
+                img = Image.open(BytesIO(flg.content))
+                img.save("./{}.jpg".format(film_info['imdbID']))
+
+                poster = requests.get(film_info['Poster'])
+                img = Image.open(BytesIO(poster.content))
+                img.save("./img.jpg")
 
             ratings = film_info['Ratings']
             rat_values = []
@@ -89,7 +104,7 @@ def pelisapi():
             average = np.mean(values) 
             
 
-            filmbag.append ([request, synopsis, film_info['Poster'], average])
+            filmbag.append ([request, title, synopsis, average])
             
             if(fl_count > fl_num):
                 # Si tenemos el número de películas solicitadas, paramos.
@@ -101,8 +116,5 @@ def pelisapi():
     
     return film_req
 
-def pdfcreator():
-    pdf=FPDF()
-    pdf.add_page()
-    pdf.set_margins()
+
     
