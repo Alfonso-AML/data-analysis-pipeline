@@ -1,6 +1,5 @@
-
-# A partir de aqui, es toda la operación para trabajar la API
-
+import pandas as pd
+import numpy as np
 import requests
 from PIL import Image
 from io import BytesIO
@@ -8,19 +7,21 @@ from io import BytesIO
 with open ("./key.txt", "r") as archivo:
     access = archivo.readlines()
 
-key = access[-1].strip()
+key = access[-1].strip()    
 
-request = 'tt0859635'
-url_data = "http://www.omdbapi.com/?i=" + request + "&apikey=82aef24e" 
+request = 'tt8079664'
+url_data = "http://www.omdbapi.com/?i={}&apikey={}".format(request, key) 
 
 
 req_data = requests.get(url_data)
 film_info = req_data.json()
 
 synopsis = film_info['Plot']
+
 poster = requests.get(film_info['Poster'])
 img = Image.open(BytesIO(poster.content))
 img.save("./img.jpg")
+
 ratings = film_info['Ratings']
 rat_values = []
 
@@ -39,6 +40,6 @@ average = np.mean(values)
 
 
 print("film rating: ", average)    
-
 print("SYNOPSIS: ",synopsis)
+img.show()
 print(type(values))
