@@ -6,6 +6,7 @@ from io import BytesIO
 from fpdf import FPDF
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, letter
+from reportlab.lib.utils import ImageReader
 
 """
 def getinfo():
@@ -33,8 +34,17 @@ r_films = pd.read_csv('./film_req.csv')
 title = r_films['title']
 synopsis = r_films['synopsis']
 rating = r_films['av_rating']
+'''
+print(r_films)
+print(r_films.columns)
+print(r_films.shape)
 
 
+for id in r_films['ID']:
+      
+    print(id)
+    cartel = Image.open("./{}.jpg".format(id))
+'''
 # Crear pdf
 def pdfcreator():
 
@@ -63,11 +73,12 @@ def pdfcreator():
 
         def fimg(self):
             c=canvas.Canvas("imagen.pdf", pagesize=A4)
-            for xs in r_films['col_n']:                                         # Aqui hago un ciclo for para añadir el numero de fila
-                cartel = Image.open("./{}.jpg".format(r_films['ID'][xs]))       # genera el pdf
-            c.drawImage(cartel, 0, 0, width=600, height=350)                    # pinta la imagen
-            c.showPage()                 
-            c.save()
+            for xs in r_films['ID']:  
+                cartel1 = Image.open("./{}.jpg".format(xs))              # genera el pdf
+                cartel = cartel1.load()
+                c.drawImage(cartel, 0, 0, width=600, height=350)                    # pinta la imagen
+                c.showPage()                 
+                c.save()
 
         def ftitle(self, title):                                                    # titulo de la pelicula
             self.set_font('Arial', '', 12)                                         # fuente Arial 12
