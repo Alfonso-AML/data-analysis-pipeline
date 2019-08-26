@@ -1,23 +1,21 @@
 import pandas as pd
 import numpy as np
-import math
 import AAML_functions as aam
+import PDF as pdf_class
 import requests
-from PIL import Image
 from io import BytesIO
-from fpdf import FPDF 
-import shutil
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4, letter
+import warnings
+
+warnings.filterwarnings('ignore')
 
 
-
-dfilms = aam.getdf()
+dfilms = pd.read_csv("./raw_data/lst_films.csv", encoding="utf8")
 
 films = aam.dfcleaner(dfilms)
-aam.filesaver(films)
+films.to_csv('./c_films.csv')
 
-aam.pelisapi()
-aam.pdfcreator()
+films = aam.pelisapi()
+aam.create_pdf(films)
 
+#'./Films Book.pdf'
 
