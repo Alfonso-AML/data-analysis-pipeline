@@ -5,6 +5,7 @@ import PDF as pdf_class
 import requests
 from io import BytesIO
 import warnings
+import webbrowser
 
 warnings.filterwarnings('ignore')
 
@@ -17,5 +18,6 @@ films.to_csv('./c_films.csv')
 films = aam.pelisapi()
 aam.create_pdf(films)
 
-#'./Films Book.pdf'
+webbrowser.open('./Films Book.pdf')
+
 
